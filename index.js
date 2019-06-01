@@ -309,13 +309,14 @@ function setupVectorLayer(glSource, accessToken, url) {
       const source = new VectorTileSource({
         attributions: tilejson.getAttributions(),
         format: new MVT(),
-        tileGrid: new TileGrid({
-          origin: tileGrid.getOrigin(),
-          extent: extent || tileGrid.getExtent(),
-          minZoom: minZoom,
-          resolutions: defaultResolutions.slice(0, maxZoom + 1),
-          tileSize: 512
-        }),
+        projection: glSource.projection || "EPSG:3031",
+        // tileGrid: new TileGrid({
+        //   origin: tileGrid.getOrigin(),
+        //   extent: extent || tileGrid.getExtent(),
+        //   minZoom: minZoom,
+        //   resolutions: defaultResolutions.slice(0, maxZoom + 1),
+        //   tileSize: 512
+        // }),
         urls: tiles
       });
       unByKey(key);
