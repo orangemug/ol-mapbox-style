@@ -11,6 +11,7 @@ import {fromLonLat} from 'ol/proj';
 import {createXYZ} from 'ol/tilegrid';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import Map from 'ol/Map';
+import {get as getProjection} from 'ol/proj';
 import View from 'ol/View';
 import GeoJSON from 'ol/format/GeoJSON';
 import MVT from 'ol/format/MVT';
@@ -302,6 +303,10 @@ function setupVectorLayer(glSource, accessToken, url) {
           }
         }
       }
+
+      const projection = getProjection(tilejson.tileJSON_.projection);
+      projection.setExtent(tilejson.tileJSON_.extent);
+
       const tileGrid = tilejson.getTileGrid();
       const extent = extentFromTileJSON(tileJSONDoc);
       const minZoom = tileJSONDoc.minzoom || 0;
@@ -309,7 +314,7 @@ function setupVectorLayer(glSource, accessToken, url) {
       const source = new VectorTileSource({
         attributions: tilejson.getAttributions(),
         format: new MVT(),
-        projection: glSource.projection || "EPSG:3031",
+        projection: projection,
         // tileGrid: new TileGrid({
         //   origin: tileGrid.getOrigin(),
         //   extent: extent || tileGrid.getExtent(),
