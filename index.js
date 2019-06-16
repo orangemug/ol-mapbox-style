@@ -304,8 +304,14 @@ function setupVectorLayer(glSource, accessToken, url) {
         }
       }
 
-      const projection = getProjection(tilejson.tileJSON_.projection);
-      projection.setExtent(tilejson.tileJSON_.extent);
+      let projection;
+      if (tilejson.tileJSON_.projection && tilejson.tileJSON_.extent) {
+        projection = getProjection(tilejson.tileJSON_.projection);
+        projection.setExtent(tilejson.tileJSON_.extent);
+      }
+      else {
+        projection = getProjection('EPSG:3857');
+      }
 
       const tileGrid = tilejson.getTileGrid();
       const extent = extentFromTileJSON(tileJSONDoc);
