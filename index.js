@@ -314,20 +314,12 @@ function setupVectorLayer(glSource, accessToken, url) {
       }
 
       const tileGrid = tilejson.getTileGrid();
-      const extent = extentFromTileJSON(tileJSONDoc);
       const minZoom = tileJSONDoc.minzoom || 0;
       const maxZoom = tileJSONDoc.maxzoom || 22;
       const source = new VectorTileSource({
         attributions: tilejson.getAttributions(),
         format: new MVT(),
         projection: projection,
-        // tileGrid: new TileGrid({
-        //   origin: tileGrid.getOrigin(),
-        //   extent: extent || tileGrid.getExtent(),
-        //   minZoom: minZoom,
-        //   resolutions: defaultResolutions.slice(0, maxZoom + 1),
-        //   tileSize: 512
-        // }),
         urls: tiles
       });
       unByKey(key);
