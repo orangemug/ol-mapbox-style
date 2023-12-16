@@ -730,6 +730,46 @@ function setupHillshadeLayer(glSource, styleUrl, options) {
   return layer;
 }
 
+let ID = 0;
+/**
+ * Generate an id if not defined.
+ * @param {number} id from geojson
+ * @return {number} id
+ */
+function defaultId(id) {
+  if (id === undefined) {
+    return ID++;
+  }
+  return id;
+}
+
+/**
+ * Mutate geojson adding `id` to features if not present
+ *
+ * @param {any} geojson Input GeoJSON
+ * @param {Object} geojsonSourceDefinition GeoJSON source definition
+ * @return {any} geojson
+ */
+function generateGeoJsonIds(geojson, geojsonSourceDefinition) {
+  if (!geojsonSourceDefinition.generateId) {
+    return geojson;
+  }
+
+  if (geojson) {
+    if (geojson.type === 'FeatureCollection') {
+      const features = geojson.features;
+      if (features) {
+        geojson.features.forEach((f) => {
+          f.id = defaultId(f.id);
+        });
+      }
+    } else if (geojson.type === 'Feature') {
+      geojson.id = defaultId(geojson.id);
+    }
+  }
+  return geojson;
+}
+
 /**
  * @param {Object} glSource glStyle source.
  * @param {string} styleUrl Style URL.
@@ -767,7 +807,9 @@ function setupGeoJSONSource(glSource, styleUrl, options) {
               const features = /** @type {*} */ (
                 source
                   .getFormat()
-                  .readFeatures(json, {featureProjection: projection})
+                  .readFeatures(generateGeoJsonIds(json, glSource), {
+                    featureProjection: projection,
+                  })
               );
               source.addFeatures(features);
               success(features);
@@ -792,7 +834,9 @@ function setupGeoJSONSource(glSource, styleUrl, options) {
             const features = /** @type {*} */ (
               source
                 .getFormat()
-                .readFeatures(json, {featureProjection: projection})
+                .readFeatures(generateGeoJsonIds(json, glSource), {
+                  featureProjection: projection,
+                })
             );
             source.addFeatures(features);
             success(features);
@@ -805,9 +849,13 @@ function setupGeoJSONSource(glSource, styleUrl, options) {
     });
     return source;
   }
-  sourceOptions.features = geoJsonFormat.readFeatures(data, {
-    featureProjection: getUserProjection() || 'EPSG:3857',
-  });
+
+  sourceOptions.features = geoJsonFormat.readFeatures(
+    generateGeoJsonIds(data, glSource),
+    {
+      featureProjection: getUserProjection() || 'EPSG:3857',
+    }
+  );
 
   const source = new VectorSource(
     Object.assign(
